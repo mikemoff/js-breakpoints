@@ -1,0 +1,77 @@
+@font-face {
+  font-family: "{{fontName}}";
+  src: {{{src}}};
+}
+
+@if not variable-exists('webfont-icons') {
+  $webfont-icons: () !global;
+}
+
+$webfont-icons: map-merge($webfont-icons, (
+      {{#each codepoints}}
+        '{{@key}}': ('{{../fontName}}' '{{this}}'),
+      {{/each}}
+));
+
+@mixin webfont-icon($name) {
+  line-height: 1;
+  $icon: map-get($webfont-icons, $name);
+  $char-code: '"\\' + nth($icon, 2) + '"';
+  &:before {
+    font-family: nth($icon, 1) !important;
+    font-style: normal;
+    vertical-align: top;
+    content: #{$char-code};
+  }
+}
+
+$break-xsm: 600px;
+$break-sm: 767px;
+$break-med: 900px;
+$break-lg: 1024px;
+
+@mixin media($size) {
+  @if $size == 'xsmall' {
+    @media only screen and (max-width: $break-xsm){ @content }
+  } 
+  @else if $size == 'small' {
+    @media only screen and (min-width: $break-xsm + 1) and (max-width: $break-sm) { @content }
+  } 
+  @else if $size == 'medium' {
+    @media only screen and (min-width: $break-sm + 1) and (max-width: $break-med) { @content }
+  } 
+  @else if $size == 'large' {
+    @media only screen and (min-width: $break-med + 1) and (max-width: $break-lg) { @content }
+  } 
+  @else {
+    @media only screen and (min-width: $break-lg + 1) { @content }
+  }
+}
+
+// icon css
+// TODO: Move this to external SASS file and figure how to import this template output
+
+#device {
+  &:before {
+    font-size: 100px;
+    color: gray;
+  }
+
+  @include media('xsmall') {
+    @include webfont-icon('phone');
+  }
+  @include media('small') {
+    @include webfont-icon('tablet');
+  }
+  @include media('medium') {
+    @include webfont-icon('tablet');
+  }
+  @include media('large') {
+    @include webfont-icon('desktop');
+  }
+  @include media('xlarge') {
+    @include webfont-icon('desktop');
+  }
+}
+
+
